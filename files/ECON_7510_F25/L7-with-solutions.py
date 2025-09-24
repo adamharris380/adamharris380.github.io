@@ -340,7 +340,7 @@ print("Eigenvectors:", vectors)
 
 # End of Python Introduction for Numerical Methods
 
-""" TWO MORE EXAMPLE PROBLEMS (FOR YOU TO TRY YOURSELF) """
+""" FOUR MORE EXAMPLE PROBLEMS (FOR YOU TO TRY YOURSELF) """
 # Example problem: Given a real number b \in (0, 900), the function returns the solution to x^3 − x^2 = b on x \in [1, 10].
 # Note: x^3 - x^2 is increasing on [1, 10].
 def g(x):

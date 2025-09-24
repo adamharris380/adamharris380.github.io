@@ -340,7 +340,7 @@ print("Eigenvectors:", vectors)
 
 # End of Python Introduction for Numerical Methods
 
-""" TWO MORE EXAMPLE PROBLEMS (FOR YOU TO TRY YOURSELF) """
+""" FOUR MORE EXAMPLE PROBLEMS (FOR YOU TO TRY YOURSELF) """
 # Example problem: Given a real number b \in (0, 900), the function returns the solution to x^3 − x^2 = b on x \in [1, 10].
 # Note: x^3 - x^2 is increasing on [1, 10].
 def g(x):
@@ -360,14 +360,7 @@ g(10.0)
 # Left as an exercise for you to write this function:
 def example_three(b):
     # Your code here
-    left, right = 1.0, 10.0
-    while right - left > 1e-7:
-        mid = (left + right) / 2
-        if g(mid) < b:
-            left = mid
-        else:
-            right = mid
-    return (left + right) / 2
+    return out
 
 
 # TEST: If the function works correctly, for any b, g(example_three(b))-b should be very close to zero
@@ -395,16 +388,7 @@ plt.show()
 # Example output: [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1]]
 # https://en.wikipedia.org/wiki/Pascal%27s_triangle
 def pascal(n):
-    out = [[1]]
-    for i in range(1,n):
-        newrow = []
-        for j in range(i):
-            if (j == 0) | (j == i):
-                newrow.append(1)
-            else:
-                newrow.append(out[-1][j-1] + out[-1][j])
-        newrow.append(1)
-        out.append(newrow)
+    # Your code here
     return out
 
 # Test cases:
@@ -424,10 +408,8 @@ max(max(pascal(100)))
 # 2. Count how many of these points fall within the quarter circle of radius 1 centered at the origin.
 # 3. The approximation of pi is then given by 4 times the ratio of points inside the quarter circle to the total number of points n.
 def approximate_pi(n):
-    points = np.random.rand(n, 2)  # Generate n random points in [0,1] x [0,1]
-    inside_circle = np.sum(points[:, 0]**2 + points[:, 1]**2 <= 1)  # Count points inside the quarter circle
-    pi_approx = 4 * inside_circle / n  # Approximate pi
-    return pi_approx
+    # Your code here
+    return out
 
 # Test cases:
 approximate_pi(1000) - np.pi # Should be close to 0
@@ -444,10 +426,8 @@ approximate_pi(1000000) - np.pi # Should be even closer to 0
 # where i! is the factorial of i.
 # math.factorial(i) computes i! in Python.
 def approximate_exponential(x, n):
-    approx = 0
-    for i in range(n):
-        approx += x ** i / math.factorial(i)
-    return approx
+    # Your code here
+    return out
 
 # Test cases: All of the below should be very close to zero
 approximate_exponential(1, 10) - np.e
