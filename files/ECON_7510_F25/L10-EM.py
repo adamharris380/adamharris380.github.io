@@ -1,6 +1,6 @@
 
-"""ECON 7510 (F24)
-Lecture 10
+"""ECON 7510 (F25)
+EM Algorithm
 Author: Adam Harris
 """
 
@@ -10,7 +10,7 @@ from scipy import stats
 
 
 ## Generate some data
-np.random.seed(1234)
+np.random.seed(123)
 n_samples = 10000
 
 μ1 = 10.0
@@ -30,7 +30,7 @@ plt.clf()
 plt.hist(data, bins=100, density=True)
 plt.show()
 
-def estimate_mixture(data, K):
+def estimate_mixture(data, K, verbose=False):
     # Initialize parameters
     μ = np.random.rand(K) * 50
     σ = np.random.rand(K) * 50
@@ -59,7 +59,7 @@ def estimate_mixture(data, K):
             if np.sum(responsibilities[:, k]) == 0:
                 print(f"Cluster {k} is empty")
         # M-step: Update parameters
-        for k in range(1, K):
+        for k in range(K):
             N_k = np.sum(responsibilities[:, k])
             weights[k] = N_k / n
             weighted_mean = np.sum(responsibilities[:, k] * data) / N_k
@@ -70,36 +70,52 @@ def estimate_mixture(data, K):
         # Check for convergence
         log_likelihood = np.sum(np.log(sum_responsibilities))
         if (log_likelihood - log_likelihood_old) < tol:
-            print(f"Converged after {iter} iterations")
+            if verbose:
+                print(f"Converged after {iter} iterations")
             break
         log_likelihood_old = log_likelihood
-        print(log_likelihood)
+        if verbose:
+            print(log_likelihood)
     return μ, σ, weights, log_likelihood
 
 ## Estimation with known K=3
-estimate_mixture(data,3)
-
 # Multistart: Run EM J times and take the result than gives best log likelihood
-J = 20
-μ, σ, weights, ll = np.zeros((J, 3)), np.zeros((J, 3)), np.zeros((J, 3)), np.zeros(J)
-for j in range(J):
-    μ[j, :], σ[j, :], weights[j, :], ll[j] = estimate_mixture(data, 3)
+def EM_multiple_starts(data, K, J, verbose=False):
+    best_log_likelihood = -np.inf
+    best_mu = None
+    best_sigma = None
+    best_weights = None
+    for j in range(J):
+        print(f"Run {j + 1}")
+        μ, σ, weights, log_likelihood = estimate_mixture(data, K, verbose=verbose)
+        if log_likelihood > best_log_likelihood:
+            best_log_likelihood = log_likelihood
+            best_mu = μ
+            best_sigma = σ
+            best_weights = weights
+        if verbose:
+            print(f"Estimated parameters:")
+            for k in range(K):
+                print(f"Component {k + 1}: μ = {μ[k]}, σ = {σ[k]}, π = {weights[k]}")
+    return best_mu, best_sigma, best_weights, best_log_likelihood
 
-plt.scatter(range(J), ll)
-best_j = np.argmax(ll)
+mu, sigma, weights, log_likelihood = EM_multiple_starts(data, 3, 10)
 
-print("Estimated parameters:")
-for k in range(3):
-    print(f"Component {k + 1}: μ = {μ[best_j, k]}, σ = {σ[best_j, k]}, π = {weights[best_j, k]}")
-
-
+# Plot simulated draws from estimated distribution:
+sim = np.concatenate([np.random.normal(mu[0], sigma[0], int(weights[0] * n_samples)),
+                       np.random.normal(mu[1], sigma[1], int(weights[1] * n_samples)),
+                       np.random.normal(mu[2], sigma[2], int(weights[2] * n_samples))])
+plt.clf()
+plt.hist(data, bins=100, density=True, alpha=0.5, label='Data')
+plt.hist(sim, bins=100, density=True, alpha=0.5, label='Estimated Mixture')
+plt.show()
 
 
 ## Estimation with unknown K
-k_vec = np.repeat(np.arange(1, 6), 10)
+k_vec = np.arange(1, 5)
 ll_vec = np.zeros(len(k_vec))
 for k in range(len(k_vec)):
-    μ, σ, π, ll = estimate_mixture(data, k_vec[k])
+    μ, σ, π, ll = EM_multiple_starts(data, k_vec[k], 10)
     ll_vec[k] = ll
 
 plt.scatter(k_vec, ll_vec)
@@ -108,3 +124,7 @@ bic = -2.0 * ll_vec + (2 * k_vec - 1) * np.log(n_samples)
 plt.scatter(k_vec, bic)
 plt.show()
 k = k_vec[bic == np.min(bic)][0]
+print(f"Best K according to BIC: {k}")
+# Even though the true DGP has K=3, it is possible that BIC may select a different K.
+# Looking at the histogram of the data, it is unsurprising that the third component may not add much in terms of fit quality.
+# And BIC penalizes model complexity, which is a good thing.  We should defer to the simpler model unless there is strong evidence otherwise.

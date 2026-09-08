@@ -1,3 +1,22 @@
+"""
+Using scipy and torch for constrained optimization.
+Adam Harris, adamharris@cornell.edu
+
+Example problem:
+(NOTE: This isn't actually important.  The point of this file is the general structure.)
+
+Finding the posterior for Bayesian regression of y on X with constraints.
+
+The typical Bayesian formulation would be
+(beta, sigma) = argmax [log P(y | X, beta, sigma) + log P(beta, sigma)]
+where P is the prior and y_i ~ N(x_i' beta, sigma^2).
+
+We also impose some frequentist-style moment constraints: (IDK why, but suppose we have a reason for doing so.)
+1. Residuals sum to zero.
+2. Residuals orthogonal to (x_1)^2.
+"""
+
+
 import numpy as np
 import torch
 from scipy.optimize import minimize, NonlinearConstraint
